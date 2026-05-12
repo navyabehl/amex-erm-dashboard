@@ -33,7 +33,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main { background-color: #f8f9fa; }
-    .stMetric { background-color: white; border-radius: 8px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .stMetric { border-radius: 8px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .rag-card {
         border-radius: 10px; padding: 14px 18px; margin: 6px 0;
         display: flex; justify-content: space-between; align-items: center;
