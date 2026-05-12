@@ -3,7 +3,6 @@
 # Streamlit Application
 # ============================================================
 
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -32,17 +31,18 @@ st.set_page_config(
 # ── Custom CSS ───────────────────────────────────────────────
 st.markdown("""
 <style>
-    .main 
     .stMetric { border-radius: 8px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    [data-testid="stMetricValue"] { color: inherit !important; }
+    [data-testid="stMetricLabel"] { color: inherit !important; }
     .rag-card {
         border-radius: 10px; padding: 14px 18px; margin: 6px 0;
         display: flex; justify-content: space-between; align-items: center;
         font-size: 0.92rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-    .rag-green  { border-left: 5px solid #2ecc71; }
-    .rag-amber  { border-left: 5px solid #f39c12; }
-    .rag-red    { border-left: 5px solid #e74c3c; }
-    .section-header { font-size: 1.05rem; font-weight: 700; color: #2c3e50; margin: 16px 0 8px 0; }
+    .rag-green { background: rgba(46,204,113,0.15); border-left: 5px solid #2ecc71; }
+    .rag-amber { background: rgba(243,156,18,0.15); border-left: 5px solid #f39c12; }
+    .rag-red   { background: rgba(231,76,60,0.15);  border-left: 5px solid #e74c3c; }
+    .section-header { font-size: 1.05rem; font-weight: 700; margin: 16px 0 8px 0; }
     .overall-banner {
         border-radius: 12px; padding: 18px 24px; text-align: center;
         font-size: 1.3rem; font-weight: 700; margin-bottom: 20px;
@@ -56,17 +56,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Load data ────────────────────────────────────────────────
-credit_df    = get_credit_risk_data()
-ops_df       = get_operational_risk_data()
-fraud_df     = get_fraud_risk_data()
-rep_df       = get_reputational_risk_data()
-thresholds   = get_risk_appetite_thresholds()
+credit_df  = get_credit_risk_data()
+ops_df     = get_operational_risk_data()
+fraud_df   = get_fraud_risk_data()
+rep_df     = get_reputational_risk_data()
+thresholds = get_risk_appetite_thresholds()
 
 YEARS = credit_df["Year"].tolist()
 
 # ── Sidebar ──────────────────────────────────────────────────
 with st.sidebar:
-    st.image("amex_logo.png", width=120)
+    st.image("https://logo.clearbit.com/americanexpress.com", width=120)
     st.markdown("## ERM Dashboard")
     st.markdown("**Enterprise Risk Management**  \nRisk Appetite Monitoring")
     st.divider()
@@ -117,10 +117,10 @@ st.markdown(f"## 📊 AmEx Enterprise Risk Appetite Dashboard — FY {selected_y
 st.markdown("*Independent risk oversight simulation using American Express public financial disclosures*")
 
 # ── Overall banner ───────────────────────────────────────────
-banner_bg = {"GREEN": "#eafaf1", "AMBER": "#fef9e7", "RED": "#fdedec"}[overall_status]
 banner_border = {"GREEN": "#2ecc71", "AMBER": "#f39c12", "RED": "#e74c3c"}[overall_status]
+banner_bg     = {"GREEN": "rgba(46,204,113,0.15)", "AMBER": "rgba(243,156,18,0.15)", "RED": "rgba(231,76,60,0.15)"}[overall_status]
 st.markdown(f"""
-<div class="overall-banner" style="background:{banner_bg}; border: 2px solid {banner_border};">
+<div class="overall-banner" style="border: 2px solid {banner_border}; background:{banner_bg};">
     {overall_emoji} Overall Risk Status: <span style="color:{banner_border}">{overall_status}</span>
     &nbsp;|&nbsp; {sum(1 for r in all_results if r['Status']=='GREEN')} GREEN &nbsp;
     {sum(1 for r in all_results if r['Status']=='AMBER')} AMBER &nbsp;
@@ -147,6 +147,14 @@ col4.metric("ESG Risk Score", f"{latest_r['ESG_Risk_Score']:.1f}",
 
 st.divider()
 
+# ── Shared chart layout helper ───────────────────────────────
+CHART_LAYOUT = dict(
+    plot_bgcolor="rgba(0,0,0,0)",
+    paper_bgcolor="rgba(0,0,0,0)",
+    font=dict(color=None),
+    margin=dict(t=40, b=20)
+)
+
 # ── Main tabs ────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🔴 Credit Risk", "⚙️ Operational Risk",
@@ -160,7 +168,7 @@ def render_rag_cards(results):
         <div class="rag-card {css}">
             <span><strong>{r['Emoji']} {r['Metric']}</strong></span>
             <span>{r['Value']}</span>
-            <span style="color:#666">YoY: {r['YoY Change']}</span>
+            <span>YoY: {r['YoY Change']}</span>
             <span><strong>{r['Status']}</strong></span>
         </div>""", unsafe_allow_html=True)
 
@@ -188,11 +196,9 @@ with tab1:
         fig.add_trace(go.Bar(x=years, y=c_df["Credit_Loss_Provision_Mn"],
             name="Provision", marker_color=colors), row=2, col=1)
 
-        fig.update_layout(height=380, showlegend=False,
-            margin=dict(t=40, b=20), plot_bgcolor="white")
+        fig.update_layout(height=380, showlegend=False, **CHART_LAYOUT)
         st.plotly_chart(fig, use_container_width=True)
 
-    # Delinquency trend
     st.markdown('<div class="section-header">Delinquency Rate Trend</div>', unsafe_allow_html=True)
     fig2 = go.Figure()
     fig2.add_trace(go.Scatter(x=years, y=c_df["Delinquency_Rate_30d_pct"],
@@ -201,8 +207,7 @@ with tab1:
         fillcolor="rgba(155,89,182,0.1)"))
     fig2.add_hline(y=1.2, line_dash="dot", line_color="#2ecc71", annotation_text="Green Threshold")
     fig2.add_hline(y=1.6, line_dash="dot", line_color="#f39c12", annotation_text="Amber Threshold")
-    fig2.update_layout(height=220, margin=dict(t=20, b=20), plot_bgcolor="white",
-        yaxis_title="30-Day Delinquency Rate (%)")
+    fig2.update_layout(height=220, yaxis_title="30-Day Delinquency Rate (%)", **CHART_LAYOUT)
     st.plotly_chart(fig2, use_container_width=True)
 
 # ── Tab 2: Operational Risk ──────────────────────────────────
@@ -227,8 +232,7 @@ with tab2:
         fig.add_hline(y=thresholds["operational"]["complaints_index"]["amber"],
             line_dash="dot", line_color="#f39c12", annotation_text="Amber", row=2, col=1)
 
-        fig.update_layout(height=380, showlegend=False,
-            margin=dict(t=40, b=20), plot_bgcolor="white")
+        fig.update_layout(height=380, showlegend=False, **CHART_LAYOUT)
         st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 3: Fraud Risk ────────────────────────────────────────
@@ -248,7 +252,6 @@ with tab3:
             name="Fraud Losses", marker_color="#e74c3c"), row=1, col=1)
         fig.add_trace(go.Bar(x=years, y=f_df["Fraud_Prevention_Investment_Mn"],
             name="Prevention Investment", marker_color="#2ecc71"), row=1, col=1)
-
         fig.add_trace(go.Scatter(x=years, y=f_df["Fraud_Loss_Rate_bps"],
             mode="lines+markers", line=dict(color="#e74c3c", width=2.5),
             name="Fraud Rate (bps)"), row=2, col=1)
@@ -258,8 +261,7 @@ with tab3:
             line_dash="dot", line_color="#f39c12", annotation_text="Amber", row=2, col=1)
 
         fig.update_layout(height=380, barmode="group", showlegend=True,
-            legend=dict(orientation="h", y=1.05),
-            margin=dict(t=40, b=20), plot_bgcolor="white")
+            legend=dict(orientation="h", y=1.05), **CHART_LAYOUT)
         st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 4: Reputational Risk ─────────────────────────────────
@@ -288,8 +290,7 @@ with tab4:
         fig.add_hline(y=150, line_dash="dot", line_color="#f39c12",
             annotation_text="Amber", row=2, col=2)
 
-        fig.update_layout(height=400, showlegend=False,
-            margin=dict(t=40, b=20), plot_bgcolor="white")
+        fig.update_layout(height=400, showlegend=False, **CHART_LAYOUT)
         st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 5: Escalation Report ─────────────────────────────────
@@ -306,7 +307,6 @@ with tab5:
         file_name=f"AmEx_ERM_Escalation_Report_{selected_year}.txt",
         mime="text/plain"
     )
-
     st.code(report_text, language=None)
 
 # ── Disclaimer ───────────────────────────────────────────────
