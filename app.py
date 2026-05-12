@@ -3,9 +3,6 @@
 # Streamlit Application
 # ============================================================
 
-import sys
-import os
-sys.path.append(os.path.dirname(__file__))
 
 import streamlit as st
 import pandas as pd
@@ -13,12 +10,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 
-from data.amex_data import (
+from amex_data import (
     get_credit_risk_data, get_operational_risk_data,
     get_fraud_risk_data, get_reputational_risk_data,
     get_risk_appetite_thresholds
 )
-from utils.rag_engine import (
+from rag_engine import (
     evaluate_credit_risk, evaluate_operational_risk,
     evaluate_fraud_risk, evaluate_reputational_risk,
     get_overall_rag, generate_escalation_report
