@@ -39,9 +39,9 @@ st.markdown("""
         display: flex; justify-content: space-between; align-items: center;
         font-size: 0.92rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-    .rag-green  { background: #eafaf1; border-left: 5px solid #2ecc71; }
-    .rag-amber  { background: #fef9e7; border-left: 5px solid #f39c12; }
-    .rag-red    { background: #fdedec; border-left: 5px solid #e74c3c; }
+    .rag-green  { border-left: 5px solid #2ecc71; }
+    .rag-amber  { border-left: 5px solid #f39c12; }
+    .rag-red    { border-left: 5px solid #e74c3c; }
     .section-header { font-size: 1.05rem; font-weight: 700; color: #2c3e50; margin: 16px 0 8px 0; }
     .overall-banner {
         border-radius: 12px; padding: 18px 24px; text-align: center;
