@@ -6,6 +6,8 @@ An independent Enterprise Risk Management (ERM) simulation that monitors America
 > **Purpose:** Academic portfolio project demonstrating ERM concepts, risk monitoring, and data automation
 
 ---
+## Live Demo
+**[▶ Try the app here](https://navyabehl-amex-erm-dashboard.streamlit.app)**
 
 ## 🎯 Project Motivation
 
