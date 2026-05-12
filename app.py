@@ -66,7 +66,7 @@ YEARS = credit_df["Year"].tolist()
 
 # ── Sidebar ──────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://logo.clearbit.com/americanexpress.com", width=120)
+    st.image("amex_logo.png", width=120)
     st.markdown("## ERM Dashboard")
     st.markdown("**Enterprise Risk Management**  \nRisk Appetite Monitoring")
     st.divider()
